@@ -5,8 +5,9 @@ describe('ERC20 Token Contract', async () => {
   let token;
   let signer1;
   let signer2;
+  let signer3;
   beforeEach(async () => {
-    [signer1, signer2] = await ethers.getSigners();
+    [signer1, signer2, signer3] = await ethers.getSigners();
     const Token = await ethers.getContractFactory('Token');
     token = await Token.deploy();
   });
@@ -72,10 +73,29 @@ describe('ERC20 Token Contract', async () => {
   describe('Transfer From Function', async () => {
     it('Check TransferFrom Function ', async () => {
       await token.mint();
-      // await token.approve( signer1.address , signer2.address , 500);
-      // await token.transferFrom( signer2.address , signer1.address , 50);
+      await token.transfer(signer2.address, 100);
+      console.log(
+        'Balance of Address 1 ',
+        await token.balanceOf(signer1.address)
+      );
+      console.log(
+        'Balance of Address 2 ',
+        await token.balanceOf(signer2.address)
+      );
+      await token.connect(signer1).approve(signer2.address, 500);
+      await token
+        .connect(signer2)
+        .transferFrom(signer1.address, signer3.address, 50);
+      console.log(
+        'Balance of Address 2 ',
+        await token.balanceOf(signer2.address)
+      );
+      console.log(
+        'Balance of Address 3 ',
+        await token.balanceOf(signer3.address)
+      );
       // console.log(await token.transferFrom( signer2.address , signer1.address , 50));
-      // expect(await token.balanceOf( signer2.address )).to.be.equal(50);
+      expect(await token.balanceOf(signer2.address)).to.be.equal(100);
       // console.log(' Token ' , token );
     });
   });
